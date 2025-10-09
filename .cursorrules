@@ -1,0 +1,88 @@
+## Cursor repository rules: GitFlow
+
+These rules define how this repository uses GitFlow. Cursor should follow these when proposing branches, commits, and pull requests.
+
+### Branch model
+- **main**: Production-ready history. Only release and hotfix merges land here.
+- **develop**: Integration branch for completed work. All feature/bugfix branches merge here first.
+- **feature/**: New work off `develop`. Example: `feature/user-auth`.
+- **bugfix/**: Non-critical fixes off `develop`. Example: `bugfix/fix-login-redirect`.
+- **release/**: Release preparation off `develop`. Example: `release/1.4.0`.
+- **hotfix/**: Critical fixes off `main`. Example: `hotfix/1.3.1-crash-on-start`.
+
+### Default targets
+- Merge `feature/*` and `bugfix/*` → `develop`.
+- Merge `release/*` → `main` (tag) and back-merge into `develop`.
+- Merge `hotfix/*` → `main` (tag) and back-merge into `develop`.
+
+### Merge strategy
+- Prefer merge commits (no fast-forward) to preserve GitFlow history.
+- Do not squash merge `release/*` or `hotfix/*` into `main`.
+
+### Branch naming conventions
+- Use lowercase, hyphen-separated words. Keep names short but descriptive.
+- Allowed prefixes: `feature/`, `bugfix/`, `release/`, `hotfix/`.
+
+### Versioning and tags
+- Use Semantic Versioning: MAJOR.MINOR.PATCH (e.g., `1.4.0`).
+- Tag releases and hotfixes on `main` as `v<version>` (e.g., `v1.4.0`).
+
+### Commit style
+- Use Conventional Commits for all messages:
+  - `feat: add password reset flow`
+  - `fix(login): correct redirect after auth`
+  - `chore(deps): bump axios to 1.7.4`
+  - `docs(readme): clarify setup`
+- Keep subject ≤72 chars; include scope when helpful; body explains why, not just what.
+
+### Pull requests
+- Title follows Conventional Commit style when possible (e.g., `feat(auth): add OAuth login`).
+- PRs from `feature/*` and `bugfix/*` target `develop`.
+- PRs from `release/*` and `hotfix/*` target `main`.
+- Include summary, implementation details, and testing notes.
+
+### Release flow (Cursor should propose these steps)
+1) Cut release: `git checkout develop` → `git pull` → `git checkout -b release/<x.y.z>`
+2) Freeze features; bump versions/CHANGELOG; finalize.
+3) Merge to main: open PR `release/<x.y.z>` → `main` using merge commit.
+4) Tag: `git tag v<x.y.z>` on the merge commit; push tags.
+5) Back-merge: merge `main` → `develop` to sync.
+
+### Hotfix flow (Cursor should propose these steps)
+1) Cut hotfix: `git checkout main` → `git pull` → `git checkout -b hotfix/<x.y.z>-<short-desc>`
+2) Implement fix; bump PATCH version.
+3) Merge to main; tag `v<x.y.z>`.
+4) Back-merge `main` → `develop` to sync.
+
+### Cursor-specific guidance (MANDATORY)
+- Never commit directly to `main` or `develop`. Always work on a topic branch.
+- When suggesting commands, ensure the correct base: `feature/*` off `develop`, `hotfix/*` off `main`.
+- When generating PR templates/titles, set the correct target branch per the rules above.
+- When creating tags in suggestions, use `v<version>` format on `main` only.
+- If unsure whether a change is a feature or bugfix, default to `feature/*` unless it clearly resolves a defect.
+
+### Quick command cheatsheet (for suggestions only)
+```
+# Feature
+git checkout develop && git pull
+git checkout -b feature/<name>
+git commit -m "feat(scope): message"
+git push -u origin feature/<name>
+
+# Bugfix
+git checkout develop && git pull
+git checkout -b bugfix/<name>
+
+# Release
+git checkout develop && git pull
+git checkout -b release/<x.y.z>
+
+# Hotfix
+git checkout main && git pull
+git checkout -b hotfix/<x.y.z>-<name>
+```
+
+### Enforcement notes
+- These rules describe intent for AI and contributors. Repo protections (branch protection, required reviews, disallow force-push) should be configured in the VCS host.
+
+
