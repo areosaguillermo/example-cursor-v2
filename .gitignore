@@ -33,6 +33,12 @@ logs/
 # TypeScript
 *.tsbuildinfo
 
+# Node API scaffolding
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 # Temporary
 tmp/
 temp/
